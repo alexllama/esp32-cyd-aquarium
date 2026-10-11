@@ -4,6 +4,7 @@
   import { createAquariumEngine } from "@/lib/aquarium/engine.js";
   import { createFixedEnvironment } from "@/lib/aquarium/environment.js";
   import { createAquariumFramebuffer } from "@/lib/aquarium/framebuffer.js";
+  import { applyNightTint, computeNightness } from "@/lib/aquarium/daynight.js";
   import { drawCenteredPixelText, measurePixelText } from "@/lib/aquarium/pixel-text.js";
   import { CanvasAquariumRenderer, RENDER_STYLES, SCALE_MODES } from "@/lib/aquarium/renderer.js";
   import { createAquariumScenery } from "@/lib/aquarium/scenery.js";
@@ -55,9 +56,43 @@
   let sizeLabel = "";
   let showMenus = true;
   let showClock = true;
+  let showHelp = false;
   let renderStyle = RENDER_STYLES.SQUARES;
 
   const dateColor = { r: 132, g: 222, b: 190, a: 220 };
+
+  const CONTROL_HELP = [
+    { keys: "Click", action: "Feed the fish" },
+    { keys: "+ / a", action: "Add a fish" },
+    { keys: "1-4", action: "Dot density" },
+    { keys: "s", action: "Dots / pixels" },
+    { keys: "p", action: "Orientation" },
+    { keys: "c", action: "Time & date" },
+    { keys: "m", action: "Menus" },
+    { keys: "/", action: "Toggle this panel" },
+    { keys: "d", action: "Debug info" },
+    { keys: "f", action: "Fullscreen" },
+    { keys: "Esc", action: "Exit" },
+  ];
+
+  const hourOverride = (() => {
+    if (typeof window === "undefined") return null;
+    const raw = new URLSearchParams(window.location.search).get("hour");
+    if (raw === null) return null;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
+  })();
+
+  const currentNightness = () => {
+    if (hourOverride === null) {
+      return computeNightness();
+    }
+    const date = new Date();
+    const hour = Math.floor(hourOverride);
+    const minute = Math.round((hourOverride - hour) * 60);
+    date.setHours(hour, minute, 0, 0);
+    return computeNightness(date);
+  };
 
   const computeLogicalSize = (densityId = density) => {
     if (isPortrait) {
@@ -174,11 +209,20 @@
     engine?.update({ now, delta, framebuffer, environment, touchPoint });
     if (framebuffer) {
       if (showClock) drawClockOverlay(now);
-      renderer.presentFramebuffer(framebuffer, {
-        scaleMode: SCALE_MODES.FIT,
-        renderStyle,
-        clearForeground: true,
-      });
+      const nightness = currentNightness();
+      if (nightness > 0.001) {
+        renderer.presentFramebuffer(framebuffer, {
+          scaleMode: SCALE_MODES.FIT,
+          renderStyle,
+          pixels: applyNightTint(framebuffer, nightness),
+        });
+      } else {
+        renderer.presentFramebuffer(framebuffer, {
+          scaleMode: SCALE_MODES.FIT,
+          renderStyle,
+          clearForeground: true,
+        });
+      }
     }
     refreshDebug(now);
     frameId = requestAnimationFrame(frame);
@@ -213,11 +257,15 @@
 
   const handleKeydown = (event) => {
     if (event.key === "Escape") {
-      if (document.fullscreenElement) {
+      if (showHelp) {
+        showHelp = false;
+      } else if (document.fullscreenElement) {
         document.exitFullscreen();
       } else {
         exitStandalone();
       }
+    } else if (event.key === "/" || event.key === "?") {
+      showHelp = !showHelp;
     } else if (event.key === "d" || event.key === "D") {
       showDebug = !showDebug;
     } else if (event.key === "f" || event.key === "F") {
@@ -317,6 +365,11 @@
     on:click={() => (showClock = !showClock)}
   >◷</button>
   <button
+    class="overlay-panel flex h-8 w-8 items-center justify-center text-sm text-emerald-100/80 transition-colors hover:bg-black/60 {showHelp ? 'text-emerald-100' : 'text-emerald-100/40'}"
+    title="Toggle controls (/)"
+    on:click={() => (showHelp = !showHelp)}
+  >?</button>
+  <button
     class="overlay-panel flex h-8 w-8 items-center justify-center text-sm text-emerald-100/80 transition-colors hover:bg-black/60 {showMenus ? 'text-emerald-100' : 'text-emerald-100/40'}"
     title="Toggle menus (m)"
     on:click={() => (showMenus = !showMenus)}
@@ -325,11 +378,11 @@
 
 {#if showMenus}
   <div class="pointer-events-none fixed left-4 top-4 flex items-center gap-2 text-xs font-medium text-emerald-100/80">
-    <span class="overlay-panel px-3 py-1">ESP32 CYD Aquarium — Simulator</span>
+    <span class="overlay-panel px-3 py-1">Aquarium Simulator</span>
     <span class="overlay-panel px-2 py-1 font-mono text-emerald-200/70">{sizeLabel}</span>
   </div>
 
-  <div class="pointer-events-none fixed left-4 top-12 flex items-center gap-2 text-xs text-emerald-100/70">
+  <div class="fixed left-4 top-12 flex items-center gap-2 text-xs text-emerald-100/70">
     <div class="overlay-panel flex items-center gap-0.5 p-1">
       {#each DENSITY_PRESETS as preset (preset.id)}
         <button
@@ -358,10 +411,6 @@
     >+ Fish</button>
   </div>
 
-  <div class="pointer-events-none fixed bottom-4 left-4 text-xs text-emerald-100/50">
-    click = feed · + = add fish · 1-4 = density · s = dots/pixels · p = orientation · c = clock · m = menus · d = debug · f = fullscreen · esc = exit
-  </div>
-
   <div class="fixed bottom-4 right-4 flex items-center gap-2">
     {#if showDebug}
       <pre class="pointer-events-none max-w-xs select-none overflow-auto rounded border border-white/10 bg-black/60 p-2 text-[10px] leading-snug text-emerald-200/90">{debugText}</pre>
@@ -373,6 +422,36 @@
     <button
       class="rounded border border-white/10 bg-black/40 px-3 py-1 text-xs font-medium text-emerald-100/80 backdrop-blur hover:bg-black/60"
       on:click={exitStandalone}
-    >Exit</button>
+     >Exit</button>
+  </div>
+{/if}
+
+{#if showHelp}
+  <div class="fixed inset-0 z-30 flex items-center justify-center p-4">
+    <button
+      class="absolute inset-0 h-full w-full cursor-default bg-black/50 backdrop-blur-sm"
+      aria-label="Close controls"
+      on:click={() => (showHelp = false)}
+    ></button>
+    <div
+      class="overlay-panel relative z-10 w-full max-w-sm p-5 text-emerald-100/80"
+      role="dialog"
+      aria-label="Controls"
+    >
+      <div class="mb-3 flex items-center justify-between">
+        <h2 class="text-sm font-semibold tracking-wide text-emerald-100">Controls</h2>
+        <button
+          class="text-emerald-100/60 transition-colors hover:text-emerald-100"
+          title="Close (/ or Esc)"
+          on:click={() => (showHelp = false)}
+        >✕</button>
+      </div>
+      <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-xs">
+        {#each CONTROL_HELP as item (item.action)}
+          <dt class="font-mono text-emerald-200/80">{item.keys}</dt>
+          <dd>{item.action}</dd>
+        {/each}
+      </dl>
+    </div>
   </div>
 {/if}
