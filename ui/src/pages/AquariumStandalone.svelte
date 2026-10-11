@@ -6,6 +6,7 @@
   import { createAquariumFramebuffer } from "@/lib/aquarium/framebuffer.js";
   import { drawCenteredPixelText, measurePixelText } from "@/lib/aquarium/pixel-text.js";
   import { CanvasAquariumRenderer, RENDER_STYLES, SCALE_MODES } from "@/lib/aquarium/renderer.js";
+  import { createAquariumScenery } from "@/lib/aquarium/scenery.js";
 
   const DENSITY_PRESETS = [
     { id: "coarse", label: "Coarse", key: "1", totalPixels: 16000, description: "~16k logical px" },
@@ -13,7 +14,7 @@
     { id: "fine", label: "Fine", key: "3", totalPixels: 100000, description: "~100k logical px" },
     { id: "ultra", label: "Ultra", key: "4", totalPixels: 240000, description: "~240k logical px" },
   ];
-  const DEFAULT_DENSITY = "medium";
+  const DEFAULT_DENSITY = "fine";
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -40,6 +41,7 @@
   let renderer;
   let framebuffer;
   let engine;
+  let scenery;
   let frameId = null;
   let resizeTimer = null;
   let mounted = false;
@@ -53,7 +55,7 @@
   let sizeLabel = "";
   let showMenus = true;
   let showClock = true;
-  let renderStyle = RENDER_STYLES.DOTS;
+  let renderStyle = RENDER_STYLES.SQUARES;
 
   const dateColor = { r: 132, g: 222, b: 190, a: 220 };
 
@@ -84,6 +86,7 @@
     const mode = { ...PANEL_MODES[modeId], id: modeId, logicalWidth: width, logicalHeight: height };
     framebuffer = createAquariumFramebuffer(modeId, { width, height });
     engine.resize({ mode, environment });
+    scenery?.resize(width, height);
     sizeLabel = `${width}×${height}`;
   };
 
@@ -167,6 +170,7 @@
 
     engine?.update({ now, delta, framebuffer, environment, touchPoint });
     if (framebuffer) {
+      scenery?.update({ framebuffer, now });
       if (showClock) drawClockOverlay(now);
       renderer.presentFramebuffer(framebuffer, {
         scaleMode: SCALE_MODES.FIT,
@@ -242,7 +246,7 @@
     renderer = new CanvasAquariumRenderer(canvas, {
       modeId: PANEL_MODE_IDS.BROWSER_LANDSCAPE,
       scaleMode: SCALE_MODES.FIT,
-      renderStyle: RENDER_STYLES.DOTS,
+      renderStyle,
     });
     const initial = computeLogicalSize(density);
     const initialMode = {
@@ -253,6 +257,7 @@
     };
     framebuffer = createAquariumFramebuffer(initial.modeId, { width: initial.width, height: initial.height });
     engine = createAquariumEngine({ mode: initialMode, environment });
+    scenery = createAquariumScenery({ width: initial.width, height: initial.height });
     sizeLabel = `${initial.width}×${initial.height}`;
     applyTargetSize();
     window.addEventListener("resize", handleWindowResize);

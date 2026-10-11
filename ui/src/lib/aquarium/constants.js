@@ -88,7 +88,7 @@ export const AQUARIUM = freeze({
   FOOD_INTERVAL_MS: 200,
   NUM_FISH_START: 5,
   NUM_FISH_IDEAL: 20,
-  NUM_PLANTS: 3,
+  NUM_PLANTS: 6,
 });
 
 export const AGE = freeze({
@@ -297,6 +297,56 @@ export const PLANTS = freeze({
   GLOW_GATE: 0.8,
   GLOW_SCALE: 1000,
   BASE_Y_OFFSET: 7,
+  COLORS: freeze([
+    freeze({ r: 0, g: 96, b: 44 }),
+    freeze({ r: 12, g: 120, b: 64 }),
+    freeze({ r: 8, g: 84, b: 96 }),
+    freeze({ r: 20, g: 140, b: 96 }),
+    freeze({ r: 44, g: 104, b: 36 }),
+    freeze({ r: 6, g: 72, b: 72 }),
+  ]),
+});
+
+export const SCENERY = freeze({
+  FLOOR_HEIGHT_FRACTION: 0.16,
+  FLOOR_MIN_PX: 3,
+  FLOOR_MAX_FRACTION: 0.3,
+  CORAL_SPACING: 12,
+  CORAL_MIN: 4,
+  CORAL_MAX: 22,
+  ROCK_SPACING: 34,
+  ROCK_MIN: 1,
+  ROCK_MAX: 5,
+  SAND_CREST: freeze({ r: 138, g: 128, b: 96, a: 255 }),
+  SAND_TOP: freeze({ r: 112, g: 100, b: 74, a: 255 }),
+  SAND_BOTTOM: freeze({ r: 62, g: 54, b: 40, a: 255 }),
+  SAND_SPECKLE_LIGHT: freeze({ r: 156, g: 146, b: 112, a: 255 }),
+  SAND_SPECKLE_DARK: freeze({ r: 48, g: 42, b: 32, a: 255 }),
+  CORAL_COLORS: freeze([
+    freeze({ r: 244, g: 122, b: 96 }),
+    freeze({ r: 232, g: 176, b: 96 }),
+    freeze({ r: 224, g: 108, b: 158 }),
+    freeze({ r: 176, g: 122, b: 232 }),
+    freeze({ r: 96, g: 200, b: 176 }),
+    freeze({ r: 236, g: 148, b: 132 }),
+    freeze({ r: 208, g: 96, b: 96 }),
+    freeze({ r: 150, g: 210, b: 120 }),
+  ]),
+  ANEMONE_COLORS: freeze([
+    freeze({ r: 236, g: 120, b: 196 }),
+    freeze({ r: 168, g: 132, b: 240 }),
+    freeze({ r: 120, g: 212, b: 236 }),
+    freeze({ r: 232, g: 148, b: 108 }),
+    freeze({ r: 148, g: 236, b: 168 }),
+    freeze({ r: 244, g: 216, b: 120 }),
+  ]),
+  ROCK_COLORS: freeze([
+    freeze({ r: 92, g: 96, b: 104 }),
+    freeze({ r: 74, g: 78, b: 88 }),
+    freeze({ r: 108, g: 104, b: 100 }),
+    freeze({ r: 64, g: 70, b: 78 }),
+  ]),
+  CORAL_TYPES: freeze(["branch", "branch", "fan", "brain", "tube", "mushroom", "anemone", "anemone"]),
 });
 
 export const WATER = freeze({

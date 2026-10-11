@@ -6,8 +6,7 @@ const TWO_PI = Math.PI * 2;
 const BLACK = Object.freeze({ r: 0, g: 0, b: 0 });
 const BRANCH_COLOR = Object.freeze({ r: 0, g: 0, b: 1 });
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-const mapValue = (value, inMin, inMax, outMin, outMax) =>
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));const mapValue = (value, inMin, inMax, outMin, outMax) =>
   ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 
 const randomRangeInt = (rng, range) => rng.int(range.min, range.maxExclusive);
@@ -36,6 +35,8 @@ export class AquariumPlant {
     this.phaseOffsets = [];
     this.lastSizeFactor = plantSizeFactor();
     this.lastGlowCount = 0;
+    this.color = PLANTS.COLORS[this.rng.int(0, PLANTS.COLORS.length)] ?? BRANCH_COLOR;
+    this.heightScale = this.rng.float(0.7, 1.35);
 
     const numBranches = randomRangeInt(this.rng, PLANTS.BRANCH_COUNT);
     const minAngle = Math.trunc(Math.PI * PLANTS.BRANCH_START_ANGLE_SCALE);
@@ -88,7 +89,7 @@ export class AquariumPlant {
 
       foreground.drawLine(
         rootNode.x * currentSizeFactor + this.pos.x,
-        rootNode.y * currentSizeFactor + this.pos.y,
+        rootNode.y * currentSizeFactor * this.heightScale + this.pos.y,
         this.pos.x,
         this.pos.y,
         BLACK,
@@ -102,10 +103,10 @@ export class AquariumPlant {
 
         foreground.drawLine(
           prevNode.x * currentSizeFactor + sway + this.pos.x,
-          prevNode.y * currentSizeFactor + this.pos.y,
+          prevNode.y * currentSizeFactor * this.heightScale + this.pos.y,
           node.x * currentSizeFactor + sway + this.pos.x,
-          node.y * currentSizeFactor + this.pos.y,
-          BRANCH_COLOR,
+          node.y * currentSizeFactor * this.heightScale + this.pos.y,
+          this.color,
         );
 
         if (nodeIndex === branch.nodes.length - 1) {
@@ -114,7 +115,7 @@ export class AquariumPlant {
             const glowIntensity = Math.floor(glowFactor * PLANTS.GLOW_SCALE);
             foreground.fillCircle(
               node.x * currentSizeFactor + sway + this.pos.x,
-              node.y * currentSizeFactor + this.pos.y,
+              node.y * currentSizeFactor * this.heightScale + this.pos.y,
               1,
               { r: glowIntensity, g: glowIntensity, b: 0 },
             );
