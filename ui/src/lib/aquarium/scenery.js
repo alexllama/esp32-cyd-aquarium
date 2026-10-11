@@ -135,13 +135,20 @@ export class AquariumScenery {
       SCENERY.ROCK_MAX,
     );
     for (let index = 0; index < count; index += 1) {
-      const radius = Math.max(1, Math.round(this.rng.float(1.1, 2.4) * this.unit));
-      const x = Math.round(this.rng.float(radius, Math.max(radius + 1, this.width - radius)));
+      const half = Math.max(1, Math.round(this.rng.float(1.2, 2.6) * this.unit));
+      const x = Math.round(this.rng.float(half, Math.max(half + 1, this.width - half)));
       const baseY = this.floorBaseY(x);
+      const height = Math.max(1, Math.round(this.rng.float(0.6, 1.3) * this.unit));
+      const rows = [];
+      for (let row = 0; row < height; row += 1) {
+        const t = height === 1 ? 0 : row / (height - 1);
+        const taper = Math.sqrt(Math.max(0, 1 - t * t * 0.85));
+        rows.push(Math.max(1, Math.round(half * taper * this.rng.float(0.7, 1.05))));
+      }
       this.rocks.push({
         x,
-        y: baseY - Math.floor(radius * 0.35),
-        radius,
+        baseY,
+        rows,
         color: SCENERY.ROCK_COLORS[this.rng.int(0, SCENERY.ROCK_COLORS.length)],
       });
     }
@@ -186,7 +193,7 @@ export class AquariumScenery {
           sway: unit * this.rng.float(0.3, 0.8),
         };
       case "brain":
-        return { radius: Math.max(1, Math.round(unit * this.rng.float(1.2, 2.4))) };
+        return { radius: Math.max(1, Math.round(unit * this.rng.float(1.0, 1.9))) };
       case "tube": {
         const tubes = this.rng.int(3, 6);
         return {
@@ -197,15 +204,15 @@ export class AquariumScenery {
       case "mushroom":
         return {
           stalk: Math.round(unit * this.rng.float(1.4, 2.8)),
-          cap: Math.max(1, Math.round(unit * this.rng.float(1.3, 2.3))),
+          cap: Math.max(1, Math.round(unit * this.rng.float(1.0, 1.8))),
           sway: unit * this.rng.float(0.4, 1.0),
         };
       default: {
-        const tentacles = this.rng.int(6, 12);
+        const tentacles = this.rng.int(7, 13);
         return {
           tentacles,
-          lengths: Array.from({ length: tentacles }, () => unit * this.rng.float(1.4, 3.0)),
-          sway: unit * this.rng.float(0.7, 1.5),
+          lengths: Array.from({ length: tentacles }, () => unit * this.rng.float(2.4, 4.4)),
+          sway: unit * this.rng.float(0.8, 1.7),
         };
       }
     }
@@ -217,12 +224,12 @@ export class AquariumScenery {
   }
 
   update({ framebuffer, now = 0 } = {}) {
-    if (!framebuffer?.background) {
-      throw new Error("AquariumScenery.update requires a framebuffer with a background layer");
+    if (!framebuffer?.foreground) {
+      throw new Error("AquariumScenery.update requires a framebuffer with a foreground layer");
     }
 
     this.resize(framebuffer.width, framebuffer.height);
-    const layer = framebuffer.background;
+    const layer = framebuffer.foreground;
     this.drawSand(layer);
     this.drawRocks(layer);
     this.drawCorals(layer, now);
@@ -246,13 +253,16 @@ export class AquariumScenery {
 
   drawRocks(layer) {
     for (const rock of this.rocks) {
-      layer.fillCircle(rock.x, rock.y, rock.radius, rock.color);
-      layer.fillCircle(
-        rock.x - rock.radius * 0.35,
-        rock.y - rock.radius * 0.45,
-        Math.max(1, rock.radius * 0.45),
-        shade(rock.color, 1.28),
-      );
+      const { x, baseY, rows, color } = rock;
+      const light = shade(color, 1.28);
+      const dark = shade(color, 0.72);
+      const capRow = Math.max(1, Math.round(rows.length * 0.55));
+      for (let row = 0; row < rows.length; row += 1) {
+        const half = rows[row];
+        const y = baseY - row;
+        layer.fillRect(x - half, y, half * 2 + 1, 1, row >= capRow ? light : color);
+      }
+      layer.fillRect(x - rows[0], baseY, rows[0] * 2 + 1, 1, dark);
     }
   }
 
@@ -296,9 +306,9 @@ export class AquariumScenery {
       const endY = originY - length;
       layer.drawLine(x, originY, midX, midY, color);
       layer.drawLine(midX, midY, endX, endY, color);
-      layer.fillCircle(endX, endY, Math.max(1, this.unit * 0.45), tip);
+      layer.fillCircle(endX, endY, Math.max(1, Math.round(this.unit * 0.35)), tip);
     }
-    layer.fillCircle(x, baseY - height, Math.max(1, this.unit * 0.5), tip);
+    layer.fillCircle(x, baseY - height, Math.max(1, Math.round(this.unit * 0.4)), tip);
   }
 
   drawFanCoral(layer, { x, baseY, color, params, phase }, now) {
@@ -319,15 +329,17 @@ export class AquariumScenery {
 
   drawBrainCoral(layer, { x, baseY, color, params }) {
     const radius = params.radius;
+    const height = Math.max(1, Math.round(radius * 0.6));
     const ridgeColor = shade(color, 0.68);
-    for (let dy = -radius; dy <= 0; dy += 1) {
-      const half = Math.round(Math.sqrt(Math.max(0, radius * radius - dy * dy)));
+    for (let dy = -height; dy <= 0; dy += 1) {
+      const ny = dy / height;
+      const half = Math.round(radius * Math.sqrt(Math.max(0, 1 - ny * ny)));
       for (let dx = -half; dx <= half; dx += 1) {
         const ridge = (dx + dy) % 3 === 0;
         layer.setPixel(x + dx, baseY + dy, ridge ? ridgeColor : color);
       }
     }
-    layer.fillCircle(x - radius * 0.35, baseY - radius * 0.6, Math.max(1, radius * 0.32), shade(color, 1.2));
+    layer.fillCircle(x - radius * 0.3, baseY - height * 0.55, Math.max(1, radius * 0.2), shade(color, 1.2));
   }
 
   drawTubeCoral(layer, { x, baseY, color, params }) {
@@ -338,7 +350,7 @@ export class AquariumScenery {
       const tubeX = x + offset;
       const top = baseY - (heights[index] ?? this.unit);
       layer.drawLine(tubeX, baseY, tubeX, top, color);
-      layer.fillCircle(tubeX, top, Math.max(1, this.unit * 0.5), tip);
+      layer.fillCircle(tubeX, top, Math.max(1, Math.round(this.unit * 0.4)), tip);
     }
   }
 
@@ -347,25 +359,41 @@ export class AquariumScenery {
     const wave = Math.sin(now * 0.0016 + phase) * sway;
     const capX = Math.round(x + wave);
     const capY = baseY - stalk;
+    const capHeight = Math.max(1, Math.round(cap * 0.55));
     layer.drawLine(x, baseY, capX, capY, shade(color, 0.85));
-    layer.fillCircle(capX, capY, cap, color);
-    layer.fillCircle(capX - cap * 0.3, capY - cap * 0.35, Math.max(1, cap * 0.5), shade(color, 1.22));
+    const rim = shade(color, 0.7);
+    for (let dy = 0; dy <= capHeight; dy += 1) {
+      const t = dy / capHeight;
+      const half = Math.round(cap * Math.sqrt(Math.max(0, 1 - t * t)));
+      layer.fillRect(capX - half, capY - dy, half * 2 + 1, 1, dy === 0 ? rim : color);
+    }
+    layer.fillCircle(
+      capX - Math.round(cap * 0.3),
+      capY - Math.round(capHeight * 0.6),
+      Math.max(1, Math.round(cap * 0.22)),
+      shade(color, 1.2),
+    );
   }
 
   drawAnemone(layer, { x, baseY, color, params, phase }, now) {
     const { tentacles, lengths, sway } = params;
-    const tip = shade(color, 1.4);
-    const baseColor = shade(color, 0.65);
-    layer.fillCircle(x, baseY - Math.round(this.unit * 0.2), Math.max(1, this.unit * 0.8), baseColor);
+    const tip = shade(color, 1.45);
+    const stem = shade(color, 0.6);
+    const footRadius = Math.max(1, Math.round(this.unit * 0.5));
+    const footTop = baseY - Math.round(this.unit * 0.4);
+    const originY = footTop - Math.round(this.unit * 0.3);
+    layer.fillCircle(x, footTop, footRadius, stem);
+    layer.drawLine(x, baseY, x, originY, stem);
     for (let index = 0; index < tentacles; index += 1) {
       const t = tentacles === 1 ? 0.5 : index / (tentacles - 1);
-      const angle = -Math.PI * (0.05 + 0.9 * t);
+      const angle = -Math.PI * (0.2 + 0.6 * t);
       const length = lengths[index] ?? this.unit;
       const wave = Math.sin(now * 0.0021 + phase + index * 0.6) * sway;
+      const originX = x + (t - 0.5) * footRadius * 1.6;
       const endX = x + Math.cos(angle) * length + wave;
-      const endY = baseY + Math.sin(angle) * length - Math.abs(wave) * 0.35;
-      layer.drawLine(x, baseY - Math.round(this.unit * 0.3), endX, endY, color);
-      layer.fillCircle(endX, endY, Math.max(1, this.unit * 0.4), tip);
+      const endY = originY + Math.sin(angle) * length - Math.abs(wave) * 0.35;
+      layer.drawLine(originX, originY, endX, endY, color);
+      layer.fillCircle(endX, endY, Math.max(1, Math.round(this.unit * 0.25)), tip);
     }
   }
 

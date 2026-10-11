@@ -168,9 +168,11 @@
     const delta = lastFrameTime ? Math.min(80, now - lastFrameTime) : 0;
     lastFrameTime = now;
 
-    engine?.update({ now, delta, framebuffer, environment, touchPoint });
     if (framebuffer) {
       scenery?.update({ framebuffer, now });
+    }
+    engine?.update({ now, delta, framebuffer, environment, touchPoint });
+    if (framebuffer) {
       if (showClock) drawClockOverlay(now);
       renderer.presentFramebuffer(framebuffer, {
         scaleMode: SCALE_MODES.FIT,
