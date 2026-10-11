@@ -26,10 +26,15 @@
   const dayLabels = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const monthLabels = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-  const getClockText = (date = new Date()) => ({
-    time: `${pad2(date.getHours())}:${pad2(date.getMinutes())}`,
-    date: `${dayLabels[date.getDay()]} ${pad2(date.getDate())} ${monthLabels[date.getMonth()]}`,
-  });
+  const getClockText = (date = new Date()) => {
+    const hours24 = date.getHours();
+    const meridiem = hours24 < 12 ? "AM" : "PM";
+    const hours12 = hours24 % 12 || 12;
+    return {
+      time: `${hours12}:${pad2(date.getMinutes())} ${meridiem}`,
+      date: `${dayLabels[date.getDay()]} ${pad2(date.getDate())} ${monthLabels[date.getMonth()]}`,
+    };
+  };
 
   let canvas;
   let renderer;
