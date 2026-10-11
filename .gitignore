@@ -44,3 +44,6 @@ vite.config.ts.timestamp-*
 # Local tools
 mklittlefs
 mklittlefs.exe
+
+# Personal notes (Notion copy) — not part of the project
+PROJECT_SUMMARY.md

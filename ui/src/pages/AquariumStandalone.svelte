@@ -8,9 +8,10 @@
   import { CanvasAquariumRenderer, RENDER_STYLES, SCALE_MODES } from "@/lib/aquarium/renderer.js";
 
   const DENSITY_PRESETS = [
-    { id: "coarse", label: "Coarse", totalPixels: 6000, description: "~6000 logical px" },
-    { id: "medium", label: "Medium", totalPixels: 10000, description: "~10000 logical px" },
-    { id: "fine", label: "Fine", totalPixels: 25000, description: "~25000 logical px" },
+    { id: "coarse", label: "Coarse", key: "1", totalPixels: 16000, description: "~16k logical px" },
+    { id: "medium", label: "Medium", key: "2", totalPixels: 45000, description: "~45k logical px" },
+    { id: "fine", label: "Fine", key: "3", totalPixels: 100000, description: "~100k logical px" },
+    { id: "ultra", label: "Ultra", key: "4", totalPixels: 240000, description: "~240k logical px" },
   ];
   const DEFAULT_DENSITY = "medium";
 
@@ -47,6 +48,7 @@
   let sizeLabel = "";
   let showMenus = true;
   let showClock = true;
+  let renderStyle = RENDER_STYLES.DOTS;
 
   const dateColor = { r: 132, g: 222, b: 190, a: 220 };
 
@@ -59,7 +61,7 @@
     const preset = DENSITY_PRESETS.find((candidate) => candidate.id === densityId) ?? DENSITY_PRESETS[1];
     const totalPixels = preset.totalPixels;
     const aspect = window.innerWidth / Math.max(1, window.innerHeight);
-    const logicalHeight = clamp(Math.round(Math.sqrt(totalPixels / aspect)), 40, 240);
+    const logicalHeight = clamp(Math.round(Math.sqrt(totalPixels / aspect)), 40, 540);
     const logicalWidth = Math.max(1, Math.round(logicalHeight * aspect));
     return { modeId: PANEL_MODE_IDS.BROWSER_LANDSCAPE, width: logicalWidth, height: logicalHeight };
   };
@@ -90,6 +92,10 @@
   const setDensity = (densityId) => {
     density = densityId;
     applyLogicalSize();
+  };
+
+  const toggleRenderStyle = () => {
+    renderStyle = renderStyle === RENDER_STYLES.DOTS ? RENDER_STYLES.SQUARES : RENDER_STYLES.DOTS;
   };
 
   const setPortrait = (portrait) => {
@@ -155,7 +161,7 @@
       if (showClock) drawClockOverlay(now);
       renderer.presentFramebuffer(framebuffer, {
         scaleMode: SCALE_MODES.FIT,
-        renderStyle: RENDER_STYLES.DOTS,
+        renderStyle,
         clearForeground: true,
       });
     }
@@ -209,6 +215,10 @@
       setDensity("medium");
     } else if (event.key === "3") {
       setDensity("fine");
+    } else if (event.key === "4") {
+      setDensity("ultra");
+    } else if (event.key === "s" || event.key === "S") {
+      toggleRenderStyle();
     } else if (event.key === "c" || event.key === "C") {
       showClock = !showClock;
     } else if (event.key === "m" || event.key === "M") {
@@ -308,7 +318,7 @@
           class="rounded px-2 py-0.5 font-medium transition-colors {density === preset.id
             ? 'bg-emerald-500/25 text-emerald-100'
             : 'text-emerald-100/60 hover:bg-white/5 hover:text-emerald-100/80'}"
-          title="Dot density: {preset.description}; [preset.id === 'coarse' ? '1' : preset.id === 'medium' ? '2' : '3']"
+          title="Dot density: {preset.description} ({preset.key})"
           on:click={() => setDensity(preset.id)}
         >{preset.label}</button>
       {/each}
@@ -318,10 +328,15 @@
       title="Toggle orientation (p); ?portrait=1 forces the 80×106 device view"
       on:click={() => setPortrait(!isPortrait)}
     >{isPortrait ? "Portrait" : "Landscape"}</button>
+    <button
+      class="overlay-panel px-3 py-1.5 font-medium transition-colors hover:bg-black/60 {renderStyle === RENDER_STYLES.SQUARES ? 'bg-emerald-500/25' : ''}"
+      title="Render style (s): dots = soft circles · pixels = crisp nearest-neighbour"
+      on:click={toggleRenderStyle}
+    >{renderStyle === RENDER_STYLES.DOTS ? "Dots" : "Pixels"}</button>
   </div>
 
   <div class="pointer-events-none fixed bottom-4 left-4 text-xs text-emerald-100/50">
-    click = feed · 1/2/3 = density · p = orientation · c = clock · m = menus · d = debug · f = fullscreen · esc = exit
+    click = feed · 1-4 = density · s = dots/pixels · p = orientation · c = clock · m = menus · d = debug · f = fullscreen · esc = exit
   </div>
 
   <div class="fixed bottom-4 right-4 flex items-center gap-2">
