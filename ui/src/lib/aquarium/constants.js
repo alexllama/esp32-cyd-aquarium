@@ -5,6 +5,7 @@ export const PANEL_MODE_IDS = freeze({
   DEVICE_64X85: "64x85-device",
   DEVICE_80X106: "80x106-device",
   DEVICE_96X128: "96x128-device",
+  BROWSER_LANDSCAPE: "browser-landscape",
 });
 
 export const PANEL_MODES = freeze({
@@ -43,6 +44,13 @@ export const PANEL_MODES = freeze({
     physicalHeight: 320,
     source: "ESP32-2432S028R portrait high-density preview",
     purpose: "device-preview-experiment",
+  }),
+  [PANEL_MODE_IDS.BROWSER_LANDSCAPE]: freeze({
+    id: PANEL_MODE_IDS.BROWSER_LANDSCAPE,
+    logicalWidth: 134,
+    logicalHeight: 75,
+    source: "browser fullscreen landscape",
+    purpose: "browser-standalone",
   }),
 });
 

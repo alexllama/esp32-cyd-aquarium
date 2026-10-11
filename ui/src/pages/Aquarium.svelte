@@ -12,6 +12,14 @@
   <div class="mt-8 flex justify-center">
     <DeviceAquariumPreview modeId={PANEL_MODE_IDS.DEVICE_80X106} />
   </div>
+  <div class="mt-3 flex justify-center">
+    <a
+      href="?standalone=1"
+      target="_blank"
+      rel="noreferrer"
+      class="inline-flex items-center gap-1.5 rounded border border-white/10 bg-black/40 px-3 py-1.5 text-xs font-medium text-emerald-100/80 backdrop-blur hover:bg-black/60"
+    >Open fullscreen aquarium</a>
+  </div>
   <div class="mt-8">
     <!-- <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-zinc-300">Last 7 days</h3> -->
     <dl class="grid grid-cols-1 gap-5 sm:grid-cols-1 lg:grid-cols-3">

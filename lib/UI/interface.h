@@ -3,6 +3,6 @@
 
 #include "Arduino.h"
 
-extern const uint8_t OPEN_MATRIX_HTML[188373];
+extern const uint8_t OPEN_MATRIX_HTML[200935];
 
 #endif

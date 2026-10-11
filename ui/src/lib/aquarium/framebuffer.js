@@ -295,7 +295,7 @@ export class FramebufferLayer {
 }
 
 export class AquariumFramebuffer {
-  constructor(modeId = DEFAULT_PANEL_MODE_ID) {
+  constructor(modeId = DEFAULT_PANEL_MODE_ID, options = {}) {
     const mode = PANEL_MODES[modeId];
     if (!mode) {
       throw new Error(`Unknown aquarium panel mode: ${modeId}`);
@@ -303,8 +303,8 @@ export class AquariumFramebuffer {
 
     this.mode = mode;
     this.modeId = mode.id;
-    this.width = mode.logicalWidth;
-    this.height = mode.logicalHeight;
+    this.width = Math.max(1, Math.floor(options.width ?? mode.logicalWidth));
+    this.height = Math.max(1, Math.floor(options.height ?? mode.logicalHeight));
     this.background = new FramebufferLayer(this.width, this.height, {
       name: "background",
       transparent: false,
@@ -380,7 +380,8 @@ export const writePackedPixelsToRGBAData = (pixels, data) => {
   return data;
 };
 
-export const createAquariumFramebuffer = (modeId = DEFAULT_PANEL_MODE_ID) => new AquariumFramebuffer(modeId);
+export const createAquariumFramebuffer = (modeId = DEFAULT_PANEL_MODE_ID, options = {}) =>
+  new AquariumFramebuffer(modeId, options);
 
 export default AquariumFramebuffer;
 
