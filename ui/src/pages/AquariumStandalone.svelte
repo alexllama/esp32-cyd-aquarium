@@ -98,6 +98,10 @@
     renderStyle = renderStyle === RENDER_STYLES.DOTS ? RENDER_STYLES.SQUARES : RENDER_STYLES.DOTS;
   };
 
+  const addFish = (count = 1) => {
+    engine?.addFish({ count, now: performance.now() });
+  };
+
   const setPortrait = (portrait) => {
     isPortrait = portrait;
     const url = new URL(window.location.href);
@@ -219,6 +223,8 @@
       setDensity("ultra");
     } else if (event.key === "s" || event.key === "S") {
       toggleRenderStyle();
+    } else if (event.key === "+" || event.key === "=" || event.key === "a" || event.key === "A") {
+      addFish(1);
     } else if (event.key === "c" || event.key === "C") {
       showClock = !showClock;
     } else if (event.key === "m" || event.key === "M") {
@@ -333,10 +339,15 @@
       title="Render style (s): dots = soft circles · pixels = crisp nearest-neighbour"
       on:click={toggleRenderStyle}
     >{renderStyle === RENDER_STYLES.DOTS ? "Dots" : "Pixels"}</button>
+    <button
+      class="overlay-panel px-3 py-1.5 font-medium transition-colors hover:bg-black/60"
+      title="Add a fish (+ or a)"
+      on:click={() => addFish(1)}
+    >+ Fish</button>
   </div>
 
   <div class="pointer-events-none fixed bottom-4 left-4 text-xs text-emerald-100/50">
-    click = feed · 1-4 = density · s = dots/pixels · p = orientation · c = clock · m = menus · d = debug · f = fullscreen · esc = exit
+    click = feed · + = add fish · 1-4 = density · s = dots/pixels · p = orientation · c = clock · m = menus · d = debug · f = fullscreen · esc = exit
   </div>
 
   <div class="fixed bottom-4 right-4 flex items-center gap-2">

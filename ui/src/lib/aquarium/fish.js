@@ -313,6 +313,25 @@ export class AquariumFishManager {
     }
   }
 
+  addFish(count = 1, now = null) {
+    const added = [];
+    for (let index = 0; index < count; index += 1) {
+      const fish = new AquariumFish({
+        rng: this.rng,
+        width: this.width,
+        height: this.height,
+        physicsScale: this.physicsScale,
+        position: new Vector2(this.rng.int(0, Math.max(1, this.width)), this.rng.int(0, Math.max(1, this.height))),
+        age: FISH_LIFECYCLE.INITIAL_RANDOM_AGE,
+        health: 1,
+        now,
+      });
+      this.fish.push(fish);
+      added.push(fish);
+    }
+    return added.length;
+  }
+
   loadStateDefinitions(definitions = [], now = null) {
     this.fish = definitions.map(
       (definition) =>

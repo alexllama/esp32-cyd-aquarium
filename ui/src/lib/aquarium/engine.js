@@ -142,6 +142,10 @@ export class AquariumEngine {
     this.food.onTouchStarted({ point, now });
   }
 
+  addFish({ count = 1, now = 0 } = {}) {
+    return this.fish.addFish(count, now);
+  }
+
   onTouchReleased() {
     this.food.onTouchReleased();
   }
