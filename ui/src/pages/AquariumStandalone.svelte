@@ -45,6 +45,8 @@
   let isPortrait = getInitialPortrait();
   let density = DEFAULT_DENSITY;
   let sizeLabel = "";
+  let showMenus = true;
+  let showClock = true;
 
   const dateColor = { r: 132, g: 222, b: 190, a: 220 };
 
@@ -150,7 +152,7 @@
 
     engine?.update({ now, delta, framebuffer, environment, touchPoint });
     if (framebuffer) {
-      drawClockOverlay(now);
+      if (showClock) drawClockOverlay(now);
       renderer.presentFramebuffer(framebuffer, {
         scaleMode: SCALE_MODES.FIT,
         renderStyle: RENDER_STYLES.DOTS,
@@ -207,6 +209,10 @@
       setDensity("medium");
     } else if (event.key === "3") {
       setDensity("fine");
+    } else if (event.key === "c" || event.key === "C") {
+      showClock = !showClock;
+    } else if (event.key === "m" || event.key === "M") {
+      showMenus = !showMenus;
     }
   };
 
@@ -275,44 +281,60 @@
   on:pointercancel={(event) => handlePointer(event, "cancel")}
 ></canvas>
 
-<div class="pointer-events-none fixed left-4 top-4 flex items-center gap-2 text-xs font-medium text-emerald-100/80">
-  <span class="overlay-panel px-3 py-1">ESP32 CYD Aquarium — Simulator</span>
-  <span class="overlay-panel px-2 py-1 font-mono text-emerald-200/70">{sizeLabel}</span>
+<!-- Corner toggles: always visible -->
+<div class="fixed right-4 top-4 flex items-center gap-2">
+  <button
+    class="overlay-panel flex h-8 w-8 items-center justify-center text-sm text-emerald-100/80 transition-colors hover:bg-black/60 {showClock ? 'text-emerald-100' : 'text-emerald-100/40'}"
+    title="Toggle time &amp; date overlay (c)"
+    on:click={() => (showClock = !showClock)}
+  >◷</button>
+  <button
+    class="overlay-panel flex h-8 w-8 items-center justify-center text-sm text-emerald-100/80 transition-colors hover:bg-black/60 {showMenus ? 'text-emerald-100' : 'text-emerald-100/40'}"
+    title="Toggle menus (m)"
+    on:click={() => (showMenus = !showMenus)}
+  >☰</button>
 </div>
 
-<div class="pointer-events-none fixed left-4 top-12 flex items-center gap-2 text-xs text-emerald-100/70">
-  <div class="overlay-panel flex items-center gap-0.5 p-1">
-    {#each DENSITY_PRESETS as preset (preset.id)}
-      <button
-        class="rounded px-2 py-0.5 font-medium transition-colors {density === preset.id
-          ? 'bg-emerald-500/25 text-emerald-100'
-          : 'text-emerald-100/60 hover:bg-white/5 hover:text-emerald-100/80'}"
-        title="Dot density: {preset.description}; [preset.id === 'coarse' ? '1' : preset.id === 'medium' ? '2' : '3']"
-        on:click={() => setDensity(preset.id)}
-      >{preset.label}</button>
-    {/each}
+{#if showMenus}
+  <div class="pointer-events-none fixed left-4 top-4 flex items-center gap-2 text-xs font-medium text-emerald-100/80">
+    <span class="overlay-panel px-3 py-1">ESP32 CYD Aquarium — Simulator</span>
+    <span class="overlay-panel px-2 py-1 font-mono text-emerald-200/70">{sizeLabel}</span>
   </div>
-  <button
-    class="overlay-panel px-3 py-1.5 font-medium transition-colors hover:bg-black/60 {isPortrait ? 'bg-emerald-500/25' : ''}"
-    title="Toggle orientation (p); ?portrait=1 forces the 80×106 device view"
-    on:click={() => setPortrait(!isPortrait)}
-  >{isPortrait ? "Portrait" : "Landscape"}</button>
-</div>
 
-<div class="pointer-events-none fixed bottom-4 left-4 text-xs text-emerald-100/50">
-  click = feed · 1/2/3 = density · p = orientation · d = debug · f = fullscreen · esc = exit
-</div>
+  <div class="pointer-events-none fixed left-4 top-12 flex items-center gap-2 text-xs text-emerald-100/70">
+    <div class="overlay-panel flex items-center gap-0.5 p-1">
+      {#each DENSITY_PRESETS as preset (preset.id)}
+        <button
+          class="rounded px-2 py-0.5 font-medium transition-colors {density === preset.id
+            ? 'bg-emerald-500/25 text-emerald-100'
+            : 'text-emerald-100/60 hover:bg-white/5 hover:text-emerald-100/80'}"
+          title="Dot density: {preset.description}; [preset.id === 'coarse' ? '1' : preset.id === 'medium' ? '2' : '3']"
+          on:click={() => setDensity(preset.id)}
+        >{preset.label}</button>
+      {/each}
+    </div>
+    <button
+      class="overlay-panel px-3 py-1.5 font-medium transition-colors hover:bg-black/60 {isPortrait ? 'bg-emerald-500/25' : ''}"
+      title="Toggle orientation (p); ?portrait=1 forces the 80×106 device view"
+      on:click={() => setPortrait(!isPortrait)}
+    >{isPortrait ? "Portrait" : "Landscape"}</button>
+  </div>
 
-<div class="fixed bottom-4 right-4 flex items-center gap-2">
-  {#if showDebug}
-    <pre class="pointer-events-none max-w-xs select-none overflow-auto rounded border border-white/10 bg-black/60 p-2 text-[10px] leading-snug text-emerald-200/90">{debugText}</pre>
-  {/if}
-  <button
-    class="rounded border border-white/10 bg-black/40 px-3 py-1 text-xs font-medium text-emerald-100/80 backdrop-blur hover:bg-black/60"
-    on:click={toggleFullscreen}
-  >Fullscreen</button>
-  <button
-    class="rounded border border-white/10 bg-black/40 px-3 py-1 text-xs font-medium text-emerald-100/80 backdrop-blur hover:bg-black/60"
-    on:click={exitStandalone}
-  >Exit</button>
-</div>
+  <div class="pointer-events-none fixed bottom-4 left-4 text-xs text-emerald-100/50">
+    click = feed · 1/2/3 = density · p = orientation · c = clock · m = menus · d = debug · f = fullscreen · esc = exit
+  </div>
+
+  <div class="fixed bottom-4 right-4 flex items-center gap-2">
+    {#if showDebug}
+      <pre class="pointer-events-none max-w-xs select-none overflow-auto rounded border border-white/10 bg-black/60 p-2 text-[10px] leading-snug text-emerald-200/90">{debugText}</pre>
+    {/if}
+    <button
+      class="rounded border border-white/10 bg-black/40 px-3 py-1 text-xs font-medium text-emerald-100/80 backdrop-blur hover:bg-black/60"
+      on:click={toggleFullscreen}
+    >Fullscreen</button>
+    <button
+      class="rounded border border-white/10 bg-black/40 px-3 py-1 text-xs font-medium text-emerald-100/80 backdrop-blur hover:bg-black/60"
+      on:click={exitStandalone}
+    >Exit</button>
+  </div>
+{/if}
