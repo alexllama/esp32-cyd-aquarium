@@ -52,6 +52,45 @@ small LED matrix.
 - No external environmental sensors needed for the default build.
 - Tested on the common ESP32-2432S028R / Cheap Yellow Display hardware.
 
+## Changes in This Fork
+
+This fork keeps the original firmware working and adds a browser-based simulator
+plus a round of visual upgrades. Everything below is on top of the upstream
+project.
+
+### Browser simulator
+
+- Fullscreen standalone web view at `?standalone`, running the same aquarium
+  engine and framebuffer pipeline as the device.
+- Landscape and portrait views; portrait matches the device's 80x106 logical
+  frame.
+- Selectable dot density: Coarse, Medium, Fine, and Ultra, all finer than the
+  original single resolution.
+- Render-style toggle between soft Dots and crisp Pixels (nearest-neighbour).
+- Day/night cycle driven by the local clock. Night starts fading in at 7pm and
+  is fully on at 8pm; it fades back to day from 6am and is fully day at 7am. At
+  night the water darkens and the rest of the scene dims.
+- Add fish on demand, feed by clicking, fullscreen mode, and a clock overlay.
+- Controls popup (the `?` button, top right) lists every key binding and can be
+  toggled with `/`. The on-screen title reads "Aquarium Simulator".
+- `?hour=21` forces a clock hour so either view can be previewed at any time.
+
+### Scene and visuals
+
+- New reef scenery: sandy substrate over varied fBm-noise terrain, lumpy rocks,
+  and multiple coral types (branch, fan, brain, tube, mushroom, and swaying
+  anemones).
+- Six plants instead of three, each with its own colour and height.
+- 12-hour AM/PM clock, with the date shown directly under the time.
+- The reef is drawn on the foreground layer so the swaying animation no longer
+  leaves trails.
+
+### Tooling
+
+- `npm run build` still inlines the web app into `lib/UI/interface.{h,cpp}` for
+  the firmware build.
+- A GitHub Pages workflow deploys the browser simulator on every push to `main`.
+
 ## Hardware
 
 Tested on:
