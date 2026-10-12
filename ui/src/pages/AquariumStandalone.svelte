@@ -158,12 +158,11 @@
   };
 
   const drawClockOverlay = (now) => {
-    const { width, height, foreground } = framebuffer;
+    const { width, foreground } = framebuffer;
     const overlay = getClockText();
     const centerX = Math.round(width / 2);
     const timeScale = width >= 74 ? 2 : 1;
     const timeSize = measurePixelText(overlay.time, { scale: timeScale, letterSpacing: timeScale });
-    const dateSize = measurePixelText(overlay.date, { scale: 1, letterSpacing: 1 });
     const pulse = Math.round(((Math.sin(now * 0.004) + 1) / 2) * 24);
     const clockColor = { r: 208 + pulse, g: 248, b: 234 + Math.floor(pulse / 2), a: 236 };
 
@@ -172,7 +171,7 @@
       letterSpacing: timeScale,
       color: clockColor,
     });
-    drawCenteredPixelText(foreground, overlay.date, centerX, Math.max(3 + timeSize.height + 3, height - dateSize.height - 3), {
+    drawCenteredPixelText(foreground, overlay.date, centerX, 3 + timeSize.height + 3, {
       scale: 1,
       letterSpacing: 1,
       color: dateColor,
