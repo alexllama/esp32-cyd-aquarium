@@ -54,8 +54,8 @@
   let isPortrait = getInitialPortrait();
   let density = DEFAULT_DENSITY;
   let sizeLabel = "";
-  let showMenus = true;
-  let showClock = true;
+  let showMenus = false;
+  let showClock = false;
   let showHelp = false;
   let renderStyle = RENDER_STYLES.SQUARES;
 
