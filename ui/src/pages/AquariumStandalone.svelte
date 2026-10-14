@@ -1,6 +1,7 @@
 <script>
   import { onDestroy, onMount } from "svelte";
   import { PANEL_MODE_IDS, PANEL_MODES } from "@/lib/aquarium/constants.js";
+  import { feedCountForFish, createHourlyFeeder } from "@/lib/aquarium/autofeed.js";
   import { createAquariumEngine } from "@/lib/aquarium/engine.js";
   import { createFixedEnvironment } from "@/lib/aquarium/environment.js";
   import { createAquariumFramebuffer } from "@/lib/aquarium/framebuffer.js";
@@ -58,6 +59,14 @@
   let showClock = false;
   let showHelp = false;
   let renderStyle = RENDER_STYLES.SQUARES;
+  let autoFeedEnabled = true;
+
+  const hourlyFeeder = createHourlyFeeder({
+    onFeed: () => {
+      const count = feedCountForFish(engine?.getFishCount() ?? 0);
+      if (count > 0) engine?.feed({ count });
+    },
+  });
 
   const dateColor = { r: 132, g: 222, b: 190, a: 220 };
 
@@ -69,6 +78,7 @@
     { keys: "p", action: "Orientation" },
     { keys: "c", action: "Time & date" },
     { keys: "m", action: "Menus" },
+    { keys: "h", action: "Hourly auto-feeder" },
     { keys: "/", action: "Toggle this panel" },
     { keys: "d", action: "Debug info" },
     { keys: "f", action: "Fullscreen" },
@@ -145,6 +155,11 @@
     engine?.addFish({ count, now: performance.now() });
   };
 
+  const toggleAutoFeed = () => {
+    autoFeedEnabled = !autoFeedEnabled;
+    if (autoFeedEnabled) hourlyFeeder.reset();
+  };
+
   const setPortrait = (portrait) => {
     isPortrait = portrait;
     const url = new URL(window.location.href);
@@ -205,6 +220,7 @@
     if (framebuffer) {
       scenery?.update({ framebuffer, now });
     }
+    if (autoFeedEnabled) hourlyFeeder.update();
     engine?.update({ now, delta, framebuffer, environment, touchPoint });
     if (framebuffer) {
       if (showClock) drawClockOverlay(now);
@@ -287,6 +303,8 @@
       showClock = !showClock;
     } else if (event.key === "m" || event.key === "M") {
       showMenus = !showMenus;
+    } else if (event.key === "h" || event.key === "H") {
+      toggleAutoFeed();
     }
   };
 
@@ -307,6 +325,7 @@
     framebuffer = createAquariumFramebuffer(initial.modeId, { width: initial.width, height: initial.height });
     engine = createAquariumEngine({ mode: initialMode, environment });
     scenery = createAquariumScenery({ width: initial.width, height: initial.height });
+    hourlyFeeder.reset();
     sizeLabel = `${initial.width}×${initial.height}`;
     applyTargetSize();
     window.addEventListener("resize", handleWindowResize);
@@ -408,6 +427,11 @@
       title="Add a fish (+ or a)"
       on:click={() => addFish(1)}
     >+ Fish</button>
+    <button
+      class="overlay-panel px-3 py-1.5 font-medium transition-colors hover:bg-black/60 {autoFeedEnabled ? 'bg-emerald-500/25' : ''}"
+      title="Hourly auto-feeder (h): drops two pieces of food per fish at the top of every hour"
+      on:click={toggleAutoFeed}
+    >Auto-feed {autoFeedEnabled ? "on" : "off"}</button>
   </div>
 
   <div class="fixed bottom-4 right-4 flex items-center gap-2">

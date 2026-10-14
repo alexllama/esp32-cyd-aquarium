@@ -88,6 +88,14 @@ export class AquariumFoodManager {
     return pieces;
   }
 
+  returnUnassigned(pieces = []) {
+    for (const piece of pieces) {
+      if (!piece.isOffScreen() && !piece.isEaten()) {
+        this.unassignedFood.push(piece);
+      }
+    }
+  }
+
   onTouchStarted({ point = null, now = 0 } = {}) {
     this.lastTouchPoint = point ? { x: point.x, y: point.y } : null;
     if (!this.touchActive) {

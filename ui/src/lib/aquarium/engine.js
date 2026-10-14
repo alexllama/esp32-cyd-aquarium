@@ -77,7 +77,9 @@ export class AquariumEngine {
     record("handleTouchInput");
     this.food.handleTouchInput(now);
     record("assignFood");
-    this.fish.assignFood(this.food.takeUnassignedFood());
+    const unassigned = this.food.takeUnassignedFood();
+    const leftover = this.fish.assignFood(unassigned);
+    this.food.returnUnassigned(leftover);
     record("updateWater");
     const waterSnapshot = this.water.update({
       framebuffer,
@@ -140,6 +142,18 @@ export class AquariumEngine {
 
   onTouchStarted({ point = null, now = 0 } = {}) {
     this.food.onTouchStarted({ point, now });
+  }
+
+  feed({ count = 1 } = {}) {
+    const pieces = [];
+    for (let index = 0; index < count; index += 1) {
+      pieces.push(this.food.addFood());
+    }
+    return pieces;
+  }
+
+  getFishCount() {
+    return this.fish.fish.length;
   }
 
   addFish({ count = 1, now = 0 } = {}) {

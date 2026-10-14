@@ -366,9 +366,13 @@ export class AquariumFishManager {
   }
 
   assignFood(foodPieces = []) {
+    const leftover = [];
     for (const piece of foodPieces) {
-      this.assignFoodToClosestFish(piece);
+      if (!this.assignFoodToClosestFish(piece)) {
+        leftover.push(piece);
+      }
     }
+    return leftover;
   }
 
   assignFoodToClosestFish(piece) {
@@ -387,7 +391,10 @@ export class AquariumFishManager {
 
     if (closestFish) {
       closestFish.setFood(piece);
+      return true;
     }
+
+    return false;
   }
 
   update({ framebuffer, co2 = CO2_THRESHOLDS.CO2_OK, stayInside = false, now = 0 } = {}) {
