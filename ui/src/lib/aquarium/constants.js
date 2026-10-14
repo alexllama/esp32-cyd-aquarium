@@ -318,7 +318,7 @@ export const COLOR_PALETTE = freeze({
 });
 
 export const FOOD = freeze({
-  FALL_SPEED: 0.3,
+  FALL_SPEED: 0.1,
   SPAWN_Y: 0,
   COLOR: freeze({ r: 255, g: 255, b: 0 }),
   EATEN_DISTANCE: 1,
