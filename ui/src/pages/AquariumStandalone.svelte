@@ -62,10 +62,8 @@
   let autoFeedEnabled = true;
 
   const hourlyFeeder = createHourlyFeeder({
-    onFeed: () => {
-      const count = feedCountForFish(engine?.getFishCount() ?? 0);
-      if (count > 0) engine?.feed({ count });
-    },
+    countProvider: () => feedCountForFish(engine?.getFishCount() ?? 0),
+    onDrop: (count) => engine?.feed({ count }),
   });
 
   const dateColor = { r: 132, g: 222, b: 190, a: 220 };
@@ -220,7 +218,7 @@
     if (framebuffer) {
       scenery?.update({ framebuffer, now });
     }
-    if (autoFeedEnabled) hourlyFeeder.update();
+    if (autoFeedEnabled) hourlyFeeder.update(new Date(), now);
     engine?.update({ now, delta, framebuffer, environment, touchPoint });
     if (framebuffer) {
       if (showClock) drawClockOverlay(now);

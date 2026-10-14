@@ -17,8 +17,8 @@ project.
   is fully on at 8pm; it fades back to day from 6am and is fully day at 7am. At
   night the water darkens and the rest of the scene dims.
 - Add fish on demand, feed by clicking, fullscreen mode, and a clock overlay.
-- An automatic feeder drops two pieces of food per fish at the top of every
-  hour, driven by the local clock (toggle with `h`).
+- An automatic feeder drops two pieces of food per fish, one at a time, at the
+  top of every hour, driven by the local clock (toggle with `h`).
 - Controls popup (the `?` button, top right) lists every key binding and can be
   toggled with `/`.
 - `?hour=21` forces a clock hour so either view can be previewed at any time.
