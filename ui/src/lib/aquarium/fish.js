@@ -362,6 +362,11 @@ export class AquariumFishManager {
       fish.panelHeight = this.height;
       fish.position.x = clamp(fish.position.x, 0, Math.max(0, this.width - 1));
       fish.position.y = clamp(fish.position.y, 0, Math.max(0, this.height - 1));
+      if (fish.motion) {
+        fish.motion.xResolution = this.width * fish.physicsScale;
+        fish.motion.yResolution = this.height * fish.physicsScale;
+        fish.motion.pos = fish.position.multiply(fish.physicsScale);
+      }
     }
   }
 

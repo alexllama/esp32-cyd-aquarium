@@ -125,11 +125,29 @@ export class Motion {
 
     this.vel = desiredVel;
     this.pos.addSelf(this.vel);
+    this.clampToBounds();
     this.acc.multiplySelf(0);
     this.angle = this.vel.heading();
     this.followingFood = false;
 
     return this.getDebugSnapshot();
+  }
+
+  clampToBounds() {
+    if (this.pos.x < 0) {
+      this.pos.x = 0;
+      if (this.vel.x < 0) this.vel.x = 0;
+    } else if (this.pos.x > this.xResolution) {
+      this.pos.x = this.xResolution;
+      if (this.vel.x > 0) this.vel.x = 0;
+    }
+    if (this.pos.y < 0) {
+      this.pos.y = 0;
+      if (this.vel.y < 0) this.vel.y = 0;
+    } else if (this.pos.y > this.yResolution) {
+      this.pos.y = this.yResolution;
+      if (this.vel.y > 0) this.vel.y = 0;
+    }
   }
 
   applyForce(force) {

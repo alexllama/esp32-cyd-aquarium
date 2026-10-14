@@ -42,6 +42,7 @@ project.
     and darting.
 - A new tank starts with six curated fish, including all three new species, so
   the community is visible on first load. Fish added later or bred stay random.
+- Fish are kept inside the tank instead of swimming off the edges.
 
 ### Tooling
 
