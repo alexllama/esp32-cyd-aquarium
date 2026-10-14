@@ -8,6 +8,7 @@ import {
   FOOD,
   HEALTH,
   MOTION_TYPES,
+  STARTING_FISH,
 } from "./constants.js";
 import { createBody } from "./body/index.js";
 import { createMotionFromLogicalPanel } from "./motion/index.js";
@@ -299,6 +300,7 @@ export class AquariumFishManager {
   initializeFish(count = AQUARIUM.NUM_FISH_START) {
     this.fish = [];
     for (let index = 0; index < count; index += 1) {
+      const species = STARTING_FISH[index % STARTING_FISH.length] ?? {};
       this.fish.push(
         new AquariumFish({
           rng: this.rng,
@@ -308,6 +310,8 @@ export class AquariumFishManager {
           position: new Vector2(this.rng.int(0, Math.max(1, this.width)), this.rng.int(0, Math.max(1, this.height))),
           age: FISH_LIFECYCLE.INITIAL_RANDOM_AGE,
           health: 1,
+          bodyType: species.bodyType,
+          motionType: species.motionType,
         }),
       );
     }

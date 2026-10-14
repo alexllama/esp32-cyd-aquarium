@@ -6,6 +6,7 @@ import { OctopusMotion } from "./octopus-motion.js";
 import { SnakeMotion } from "./snake-motion.js";
 import { StarMotion } from "./star-motion.js";
 import { TurtleMotion } from "./turtle-motion.js";
+import { AngelfishMotion, ClownfishMotion, NeonTetraMotion } from "./tropical-fish-motion.js";
 
 export const MOTION_TYPE_CONSTRUCTORS = Object.freeze({
   [MOTION_TYPES.FISH]: FishMotion,
@@ -13,6 +14,9 @@ export const MOTION_TYPE_CONSTRUCTORS = Object.freeze({
   [MOTION_TYPES.STAR]: StarMotion,
   [MOTION_TYPES.SNAKE]: SnakeMotion,
   [MOTION_TYPES.OCTOPUS]: OctopusMotion,
+  [MOTION_TYPES.ANGELFISH]: AngelfishMotion,
+  [MOTION_TYPES.CLOWNFISH]: ClownfishMotion,
+  [MOTION_TYPES.NEON_TETRA]: NeonTetraMotion,
 });
 
 export const createMotion = (type, positionOrOptions = new Vector2(), xResolution, yResolution, options = {}) => {

@@ -29,6 +29,18 @@ project.
 - Six plants instead of three, each with its own color and height.
 - 12-hour AM/PM clock, with the date shown directly under the time.
 
+### Fish
+
+- Three new tropical species, each with its own shape, colors, and movement:
+  - **Angelfish**: tall, laterally compressed silver body with charcoal vertical
+    bars; slow and graceful.
+  - **Clownfish**: orange body with white bands; a medium-paced side-to-side
+    waddle.
+  - **Neon Tetra**: small and slim with a blue front and red rear stripe; fast
+    and darting.
+- A new tank starts with six curated fish, including all three new species, so
+  the community is visible on first load. Fish added later or bred stay random.
+
 ### Tooling
 
 - `npm run build` inlines the web app into `lib/UI/interface.{h,cpp}` for

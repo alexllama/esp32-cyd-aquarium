@@ -5,3 +5,4 @@ export * from "./octopus-motion.js";
 export * from "./snake-motion.js";
 export * from "./star-motion.js";
 export * from "./turtle-motion.js";
+export * from "./tropical-fish-motion.js";

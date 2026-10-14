@@ -7,3 +7,4 @@ export * from "./octopus-body.js";
 export * from "./snake-body.js";
 export * from "./star-body.js";
 export * from "./turtle-body.js";
+export * from "./tropical-fish-body.js";

@@ -86,7 +86,7 @@ export const AQUARIUM = freeze({
   AQUARIUM_SAVE_INTERVAL_MINUTES: 30,
   BORDER_BUFFER: 0,
   FOOD_INTERVAL_MS: 200,
-  NUM_FISH_START: 5,
+  NUM_FISH_START: 6,
   NUM_FISH_IDEAL: 20,
   NUM_PLANTS: 6,
 });
@@ -132,6 +132,9 @@ export const BODY_TYPES = freeze({
   STAR: "Star",
   SNAKE: "Snake",
   OCTOPUS: "Octopus",
+  ANGELFISH: "Angelfish",
+  CLOWNFISH: "Clownfish",
+  NEON_TETRA: "NeonTetra",
 });
 
 export const MOTION_TYPES = freeze({
@@ -140,6 +143,9 @@ export const MOTION_TYPES = freeze({
   STAR: "Star",
   SNAKE: "Snake",
   OCTOPUS: "Octopus",
+  ANGELFISH: "Angelfish",
+  CLOWNFISH: "Clownfish",
+  NEON_TETRA: "NeonTetra",
 });
 
 export const BODY_PART_TYPES = freeze({
@@ -150,11 +156,23 @@ export const BODY_PART_TYPES = freeze({
 });
 
 export const FISH_TYPE_SELECTION = freeze([
-  freeze({ bodyType: BODY_TYPES.FISH, motionType: MOTION_TYPES.FISH, probability: 0.5 }),
-  freeze({ bodyType: BODY_TYPES.STAR, motionType: MOTION_TYPES.STAR, probability: 0.1 }),
-  freeze({ bodyType: BODY_TYPES.TURTLE, motionType: MOTION_TYPES.TURTLE, probability: 0.2 }),
-  freeze({ bodyType: BODY_TYPES.SNAKE, motionType: MOTION_TYPES.SNAKE, probability: 0.1 }),
-  freeze({ bodyType: BODY_TYPES.OCTOPUS, motionType: MOTION_TYPES.OCTOPUS, probability: 0.1 }),
+  freeze({ bodyType: BODY_TYPES.FISH, motionType: MOTION_TYPES.FISH, probability: 0.22 }),
+  freeze({ bodyType: BODY_TYPES.ANGELFISH, motionType: MOTION_TYPES.ANGELFISH, probability: 0.14 }),
+  freeze({ bodyType: BODY_TYPES.CLOWNFISH, motionType: MOTION_TYPES.CLOWNFISH, probability: 0.14 }),
+  freeze({ bodyType: BODY_TYPES.NEON_TETRA, motionType: MOTION_TYPES.NEON_TETRA, probability: 0.14 }),
+  freeze({ bodyType: BODY_TYPES.TURTLE, motionType: MOTION_TYPES.TURTLE, probability: 0.12 }),
+  freeze({ bodyType: BODY_TYPES.STAR, motionType: MOTION_TYPES.STAR, probability: 0.06 }),
+  freeze({ bodyType: BODY_TYPES.SNAKE, motionType: MOTION_TYPES.SNAKE, probability: 0.06 }),
+  freeze({ bodyType: BODY_TYPES.OCTOPUS, motionType: MOTION_TYPES.OCTOPUS, probability: 0.12 }),
+]);
+
+export const STARTING_FISH = freeze([
+  freeze({ bodyType: BODY_TYPES.ANGELFISH, motionType: MOTION_TYPES.ANGELFISH }),
+  freeze({ bodyType: BODY_TYPES.CLOWNFISH, motionType: MOTION_TYPES.CLOWNFISH }),
+  freeze({ bodyType: BODY_TYPES.NEON_TETRA, motionType: MOTION_TYPES.NEON_TETRA }),
+  freeze({ bodyType: BODY_TYPES.FISH, motionType: MOTION_TYPES.FISH }),
+  freeze({ bodyType: BODY_TYPES.TURTLE, motionType: MOTION_TYPES.TURTLE }),
+  freeze({ bodyType: BODY_TYPES.FISH, motionType: MOTION_TYPES.FISH }),
 ]);
 
 export const FISH_LIFECYCLE = freeze({
@@ -254,6 +272,36 @@ export const MOTION_PROFILES = freeze({
     NOISE_AMPLITUDE: 0.1,
     NOISE_FREQUENCY: 0.01,
     DO_MOTION: freeze(["frontSineMotion"]),
+  }),
+  [MOTION_TYPES.ANGELFISH]: freeze({
+    MAX_SPEED: 14,
+    MIN_SPEED: 4,
+    MAX_FORCE: 0.18,
+    SIN_AMPLITUDE: 1.2,
+    SIN_FREQUENCY: 0.0008,
+    NOISE_AMPLITUDE: 2.2,
+    NOISE_FREQUENCY: 0.006,
+    DO_MOTION: freeze(["frontSineMotion", "noiseMotion"]),
+  }),
+  [MOTION_TYPES.CLOWNFISH]: freeze({
+    MAX_SPEED: 24,
+    MIN_SPEED: 8,
+    MAX_FORCE: 0.35,
+    SIN_AMPLITUDE: 4,
+    SIN_FREQUENCY: 0.003,
+    NOISE_AMPLITUDE: 3,
+    NOISE_FREQUENCY: 0.012,
+    DO_MOTION: freeze(["sideSineMotion", "noiseMotion"]),
+  }),
+  [MOTION_TYPES.NEON_TETRA]: freeze({
+    MAX_SPEED: 36,
+    MIN_SPEED: 16,
+    MAX_FORCE: 0.5,
+    SIN_AMPLITUDE: 3.5,
+    SIN_FREQUENCY: 0.006,
+    NOISE_AMPLITUDE: 5,
+    NOISE_FREQUENCY: 0.02,
+    DO_MOTION: freeze(["sideSineMotion", "noiseMotion"]),
   }),
 });
 

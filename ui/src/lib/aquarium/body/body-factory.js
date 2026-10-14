@@ -6,6 +6,7 @@ import { OctopusBody } from "./octopus-body.js";
 import { SnakeBody } from "./snake-body.js";
 import { StarBody } from "./star-body.js";
 import { TurtleBody } from "./turtle-body.js";
+import { AngelfishBody, ClownfishBody, NeonTetraBody } from "./tropical-fish-body.js";
 
 export const BODY_TYPE_CONSTRUCTORS = Object.freeze({
   [BODY_TYPES.FISH]: FishBody,
@@ -13,6 +14,9 @@ export const BODY_TYPE_CONSTRUCTORS = Object.freeze({
   [BODY_TYPES.STAR]: StarBody,
   [BODY_TYPES.SNAKE]: SnakeBody,
   [BODY_TYPES.OCTOPUS]: OctopusBody,
+  [BODY_TYPES.ANGELFISH]: AngelfishBody,
+  [BODY_TYPES.CLOWNFISH]: ClownfishBody,
+  [BODY_TYPES.NEON_TETRA]: NeonTetraBody,
 });
 
 const BODY_TYPE_LIST = Object.freeze(Object.values(BODY_TYPES));
