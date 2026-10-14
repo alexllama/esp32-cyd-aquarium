@@ -315,7 +315,7 @@ export class AquariumScenery {
     const { radius, rays, sway } = params;
     const tip = shade(color, 1.32);
     const stalkTop = baseY - Math.round(radius * 0.35);
-    const wave = Math.sin(now * 0.0011 + phase) * sway;
+    const wave = Math.sin(now * 0.0011 * SCENERY.SWAY_SPEED + phase) * sway;
     layer.drawLine(x, baseY, x, stalkTop, color);
     for (let ray = 0; ray < rays; ray += 1) {
       const t = rays === 1 ? 0.5 : ray / (rays - 1);
@@ -356,7 +356,7 @@ export class AquariumScenery {
 
   drawMushroomCoral(layer, { x, baseY, color, params, phase }, now) {
     const { stalk, cap, sway } = params;
-    const wave = Math.sin(now * 0.0016 + phase) * sway;
+    const wave = Math.sin(now * 0.0016 * SCENERY.SWAY_SPEED + phase) * sway;
     const capX = Math.round(x + wave);
     const capY = baseY - stalk;
     const capHeight = Math.max(1, Math.round(cap * 0.55));
@@ -388,7 +388,7 @@ export class AquariumScenery {
       const t = tentacles === 1 ? 0.5 : index / (tentacles - 1);
       const angle = -Math.PI * (0.2 + 0.6 * t);
       const length = lengths[index] ?? this.unit;
-      const wave = Math.sin(now * 0.0021 + phase + index * 0.6) * sway;
+      const wave = Math.sin(now * 0.0021 * SCENERY.SWAY_SPEED + phase + index * 0.6) * sway;
       const originX = x + (t - 0.5) * footRadius * 1.6;
       const endX = x + Math.cos(angle) * length + wave;
       const endY = originY + Math.sin(angle) * length - Math.abs(wave) * 0.35;
